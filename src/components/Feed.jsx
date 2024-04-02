@@ -1,8 +1,18 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Stack, Typography } from "@mui/material";
 import Sidebar from "./Sidebar";
+import Videos from "./Videos";
+import { fetchFromApi } from "../utils/fetchFromApi";
 
 const Feed = () => {
+  let [selectedCategory, setSelectedCategory] = useState("New");
+  let [videos, setVideos] = useState([]);
+
+  useEffect(() => {
+    fetchFromApi(`search?part=snippet&q=${selectedCategory}`).then((data) => {
+      setVideos(data.items);
+    });
+  }, [selectedCategory]);
   return (
     <Stack sx={{ flexDirection: { sx: "column", md: "row" } }}>
       <Box
@@ -12,7 +22,10 @@ const Feed = () => {
           px: { sx: 0, md: 2 },
         }}
       >
-        <Sidebar />
+        <Sidebar
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+        />
         <Typography
           className="copyright"
           variant="body2"
@@ -20,6 +33,18 @@ const Feed = () => {
         >
           Copyright 2024 GRT Media
         </Typography>
+      </Box>
+      <Box p={2} sx={{ overflowY: "auto", height: "90vh", flex: 2 }}>
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          mb={2}
+          sx={{ color: "white" }}
+        >
+          {selectedCategory}
+          <span style={{ color: "#F31503" }}></span>
+        </Typography>
+        <Videos videos={videos} />
       </Box>
     </Stack>
   );
